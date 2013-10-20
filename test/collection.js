@@ -11,14 +11,19 @@ var dbPath = './testdb',
 
 describe('bootstrap', function() {
 	it('remove previous and create new test db', function(done) {
-		if (fs.existsSync(dbPath)) levelup.destroy(dbPath, function(err) {
+		if (fs.existsSync(dbPath)) {
+			levelup.destroy(dbPath, createDb);
+		} else {
+			createDb();
+		}
+		function createDb(err) {
 			if (err) {done(err); return;}
 			db = levelup(dbPath, {
 				keyEncoding: 'json',
 				valueEncoding: 'json'
 			});
 			done();
-		});
+		}
 	});
 });
 
