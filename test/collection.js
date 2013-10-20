@@ -27,13 +27,40 @@ describe('bootstrap', function() {
 	});
 });
 
+var tasks = [{
+	id: 1,
+	title: 'Task 1 at project 1',
+	project: 'project 1',
+	version: '1.0.0'
+}, {
+	id: 2,
+	title: 'Task 2 at project 1',
+	project: 'project 1',
+	version: '1.0.0'
+}, {
+	id: 3,
+	title: 'Task 1 at project 2',
+	project: 'project 2',
+	version: '2.0'
+}, {
+	id: 4,
+	title: 'Task 2 at project 2',
+	project: 'project 2',
+	version: '2.0'
+}, {
+	id: 5,
+	title: 'Task 1 at project 3',
+	project: 'project 3',
+	version: '0.1'
+}, {
+	id: 6,
+	title: 'Task 2 at project 3',
+	project: 'project 3',
+	version: '0.2'
+}];
+
 describe('simple batch (without projections)', function() {
 	var tasksBatch = null;
-	var tasks = [{
-		title: 'Task 1', project: 'project 1'
-	}, {
-		title: 'Task 2', project: 'project 2'
-	}];
 
 	it('will no be created without db or prefix', function(done) {
 		expect(function() {
