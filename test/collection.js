@@ -132,7 +132,7 @@ describe('batch with projections', function() {
 		});
 	});
 
-	it('found value by start', function(done) {
+	it('found value by start (with 1 field)', function(done) {
 		tasksBatch.find({
 			start: {project: 'project 2'}
 		}, function(err, data) {
@@ -142,7 +142,27 @@ describe('batch with projections', function() {
 		});
 	});
 
-	it('found value by start and end', function(done) {
+	it('found value by start (with 1 field) using 2 projection', function(done) {
+		tasksBatch.find({
+			start: {assignee: 'jane'}
+		}, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data).eql([tasks[1], tasks[3]]);
+			done();
+		});
+	});
+
+	it('found value by start (with 2 field)', function(done) {
+		tasksBatch.find({
+			start: {project: 'project 3', version: '0.1'}
+		}, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data).eql(tasks.slice(4, 5));
+			done();
+		});
+	});
+
+	it('found value by start and end  (with 1 field)', function(done) {
 		tasksBatch.find({
 			start: {project: 'project 1'},
 			end: {project: 'project 2'}
@@ -152,4 +172,16 @@ describe('batch with projections', function() {
 			done();
 		});
 	});
+
+	it('found value by start and end (with 2 field)', function(done) {
+		tasksBatch.find({
+			start: {project: 'project 3', version: '0.1'},
+			end: {project: 'project 3', version: '0.2'}
+		}, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data).eql(tasks.slice(4, 6));
+			done();
+		});
+	});
+
 });
