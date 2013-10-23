@@ -65,6 +65,37 @@ var tasks = [{
 	assignee: 'sam'
 }];
 
+function getTasks(projection, params) {
+	var sortIndexHash = {};
+	var newTasks = tasks.map(function(task) {
+		return getProjKey(task, projection);
+	}).sort().map(function(sortIndex) {
+		return tasks.filter(function(task) {
+			return getProjKey(task, projection) == sortIndex;
+		})[0];
+	});
+	params.start = getStrKey(params.start);
+	params.end = params.end ? getStrKey(params.end) : params.start;
+	params.end += Batch.prototype.end;
+	newTasks = tasks.filter(function(task) {
+		var sortIndex = getProjKey(task, projection);
+		return sortIndex >= params.start && sortIndex <= params.end;
+	});
+	return newTasks;
+}
+
+function getProjKey() {
+	return Batch.prototype._getProjKey.apply(
+		{prefix: 'prefix', separator: '~'}, arguments
+	);
+}
+
+function getStrKey() {
+	return Batch.prototype._getStrKey.apply(
+		{prefix: 'prefix', separator: '~'}, arguments
+	);
+}
+
 describe('simple batch (without projections)', function() {
 	var tasksBatch = null;
 
@@ -110,15 +141,14 @@ describe('simple batch (without projections)', function() {
 });
 
 describe('batch with projections', function() {
-	var tasksBatch = null;
+	var tasksBatch = null,
+		taskProjs = [
+			['project', 'version', 'assignee', 'id'],
+			['assignee', 'project', 'version', 'id']
+		];
 
 	it('created without errors', function(done) {
-		tasksBatch = new Batch(db, 'tasks', {
-			projections: [
-				['project', 'version', 'assignee', 'id'],
-				['assignee', 'project', 'version', 'id']
-			]
-		});
+		tasksBatch = new Batch(db, 'tasks', {projections: taskProjs});
 		done();
 	});
 
@@ -133,53 +163,52 @@ describe('batch with projections', function() {
 	});
 
 	it('found value by start (with 1 field)', function(done) {
-		tasksBatch.find({
-			start: {project: 'project 2'}
-		}, function(err, data) {
+		var params = {start: {project: 'project 2'}};
+		tasksBatch.find(params, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql(tasks.slice(2, 4));
+			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
 	});
 
 	it('found value by start (with 1 field) using 2 projection', function(done) {
-		tasksBatch.find({
-			start: {assignee: 'jane'}
-		}, function(err, data) {
+		var params = {start: {assignee: 'jane'}};
+		tasksBatch.find(params, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql([tasks[1], tasks[3]]);
+			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
 		});
 	});
 
 	it('found value by start (with 2 field)', function(done) {
-		tasksBatch.find({
-			start: {project: 'project 3', version: '0.1'}
-		}, function(err, data) {
+		var params = {start: {project: 'project 3', version: '0.1'}};
+		tasksBatch.find(params, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql(tasks.slice(4, 5));
+			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
 	});
 
 	it('found value by start and end  (with 1 field)', function(done) {
-		tasksBatch.find({
+		var params = {
 			start: {project: 'project 1'},
 			end: {project: 'project 2'}
-		}, function(err, data) {
+		};
+		tasksBatch.find(params, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql(tasks.slice(0, 4));
+			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
 	});
 
 	it('found value by start and end (with 2 field)', function(done) {
-		tasksBatch.find({
+		var params = {
 			start: {project: 'project 3', version: '0.1'},
 			end: {project: 'project 3', version: '0.2'}
-		}, function(err, data) {
+		};
+		tasksBatch.find(params, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql(tasks.slice(4, 6));
+			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
 	});
@@ -195,23 +224,25 @@ describe('batch with projections', function() {
 	});
 
 	it('check that docs updated via 1 projection', function(done) {
-		tasksBatch.find({
+		var params = {
 			start: {project: 'project 1'},
 			end: {project: 'project 3'}
-		}, function(err, data) {
+		};
+		tasksBatch.find(params, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql(tasks);
+			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
 	});
 
 	it('check that docs updated via 2 projection', function(done) {
-		tasksBatch.find({
+		var params = {
 			start: {assignee: 'sam', project: 'project 1'},
 			end: {assignee: 'sam', project: 'project 3'}
-		}, function(err, data) {
+		};
+		tasksBatch.find(params, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql([tasks[0], tasks[5]]);
+			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
 		});
 	});
