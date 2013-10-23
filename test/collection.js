@@ -184,4 +184,35 @@ describe('batch with projections', function() {
 		});
 	});
 
+	it('update document (put existsing one) without errors', function(done) {
+		var task = tasks.pop();
+		task.project = 'project 1';
+		tasks.splice(0, 0, task);
+		tasksBatch.put(task, function(err, data) {
+			if (err) {done(err); return;}
+			done();
+		});
+	});
+
+	it('check that docs updated via 1 projection', function(done) {
+		tasksBatch.find({
+			start: {project: 'project 1'},
+			end: {project: 'project 3'}
+		}, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data).eql(tasks);
+			done();
+		});
+	});
+
+	it('check that docs updated via 2 projection', function(done) {
+		tasksBatch.find({
+			start: {assignee: 'sam', project: 'project 1'},
+			end: {assignee: 'sam', project: 'project 3'}
+		}, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data).eql([tasks[0], tasks[5]]);
+			done();
+		});
+	});
 });
