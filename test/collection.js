@@ -132,12 +132,23 @@ describe('batch with projections', function() {
 		});
 	});
 
-	it('found value by start end', function(done) {
+	it('found value by start', function(done) {
 		tasksBatch.find({
 			start: {project: 'project 2'}
 		}, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(tasks.slice(2, 4));
+			done();
+		});
+	});
+
+	it('found value by start and end', function(done) {
+		tasksBatch.find({
+			start: {project: 'project 1'},
+			end: {project: 'project 2'}
+		}, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data).eql(tasks.slice(0, 4));
 			done();
 		});
 	});
