@@ -3,7 +3,8 @@
 var expect = require('expect.js'),
 	levelup = require('level'),
 	fs = require('fs'),
-	Batch = require('../lib').Batch;
+	ValBatch = require('../lib').ValBatch,
+	DocsBatch = require('../lib').DocsBatch;
 
 
 var dbPath = './testdb',
@@ -76,7 +77,7 @@ function getTasks(projection, params) {
 	});
 	params.start = getStrKey(params.start);
 	params.end = params.end ? getStrKey(params.end) : params.start;
-	params.end += Batch.prototype.end;
+	params.end += DocsBatch.prototype.end;
 	newTasks = tasks.filter(function(task) {
 		var sortIndex = getProjKey(task, projection);
 		return sortIndex >= params.start && sortIndex <= params.end;
@@ -85,32 +86,32 @@ function getTasks(projection, params) {
 }
 
 function getProjKey() {
-	return Batch.prototype._getProjKey.apply(
+	return DocsBatch.prototype._getProjKey.apply(
 		{prefix: 'prefix', separator: '~'}, arguments
 	);
 }
 
 function getStrKey() {
-	return Batch.prototype._getStrKey.apply(
+	return DocsBatch.prototype._getStrKey.apply(
 		{prefix: 'prefix', separator: '~'}, arguments
 	);
 }
 
-describe('simple batch (without projections)', function() {
+describe('value batch', function() {
 	var tasksBatch = null;
 
-	it('will no be created without db or prefix', function(done) {
+	it('will not be created without db or prefix', function(done) {
 		expect(function() {
-			tasksBatch = new Batch();
+			tasksBatch = new ValBatch();
 		}).throwError('`db` for batch is not set');
 		expect(function() {
-			tasksBatch = new Batch(db);
+			tasksBatch = new ValBatch(db);
 		}).throwError('`prefix` for batch is not set');
 		done();
 	});
 
 	it('created without errors', function(done) {
-		tasksBatch = new Batch(db, 'tasks');
+		tasksBatch = new ValBatch(db, 'tasks');
 		done();
 	});
 
@@ -140,7 +141,7 @@ describe('simple batch (without projections)', function() {
 	});
 });
 
-describe('batch with projections', function() {
+describe('projected batch', function() {
 	var tasksBatch = null,
 		taskProjs = [
 			['project', 'version', 'assignee', 'id'],
@@ -148,7 +149,7 @@ describe('batch with projections', function() {
 		];
 
 	it('created without errors', function(done) {
-		tasksBatch = new Batch(db, 'tasks', {projections: taskProjs});
+		tasksBatch = new DocsBatch(db, 'tasks', {projections: taskProjs});
 		done();
 	});
 
