@@ -239,6 +239,14 @@ describe('documents section', function() {
 		});
 	});
 
+	it('without condition found all', function(done) {
+		tasksSection.find({start: {id: ''}}, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data).eql(getTasks(['id'], {start: {id: ''}}));
+			done();
+		});
+	});
+
 	it('update document (put existsing one) without errors', function(done) {
 		var task = tasks.pop();
 		task.project = 'project 1';
@@ -274,4 +282,28 @@ describe('documents section', function() {
 			done();
 		});
 	});
+
+	// it('delete', function(done) {
+	// 	var params = {start: {project: 'project 1'}};
+	// 	tasksSection.find(params, function(err, data) {
+	// 		if (err) {done(err); return;}
+	// 		expect(data.length).greaterThan(0);
+	// 		tasksSection.del(data, function() {
+	// 			getTasks(taskProjs[1], params).forEach(function(task) {
+	// 				for (var i = 0; i < tasks.length; i++) {
+	// 					if (task.id == tasks[i].id) {
+	// 						tasks.splice(i, 1);
+	// 						break;
+	// 					}
+	// 				}
+	// 			});
+	// 			tasksSection.find({}, function(err, data) {
+	// 				console.log('>>>> data = ', data)
+	// 				if (err) {done(err); return;}
+	// 				expect(data).eql(tasks);
+	// 				done();
+	// 			});
+	// 		});
+	// 	});
+	// });
 });
