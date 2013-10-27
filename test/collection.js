@@ -87,26 +87,26 @@ function getTasks(projection, params) {
 
 function getProjKey() {
 	return DocsSection.prototype._getProjKey.apply(
-		{prefix: 'prefix', separator: '~'}, arguments
+		{name: 'name', separator: '~'}, arguments
 	);
 }
 
 function getStrKey() {
 	return DocsSection.prototype._getStrKey.apply(
-		{prefix: 'prefix', separator: '~'}, arguments
+		{name: 'name', separator: '~'}, arguments
 	);
 }
 
 describe('single value section', function() {
 	var tasksSection = null;
 
-	it('will not be created without db or prefix', function(done) {
+	it('will not be created without db or name', function(done) {
 		expect(function() {
 			tasksSection = new ValSection();
 		}).throwError('`db` for batch is not set');
 		expect(function() {
 			tasksSection = new ValSection(db);
-		}).throwError('`prefix` for batch is not set');
+		}).throwError('`name` for batch is not set');
 		done();
 	});
 
