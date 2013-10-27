@@ -153,14 +153,12 @@ describe('documents section', function() {
 		done();
 	});
 
-	it('put key and value without errors', function(done) {
-		var putCount = 0;
-		tasks.forEach(function(task) {
-			tasksSection.put(task, function() {
-				putCount++;
-				if (putCount == tasks.length) done();
-			});
-		});
+	it('put single doc without errors', function(done) {
+		tasksSection.put(tasks[0], done);
+	});
+
+	it('put docs in batch without errors', function(done) {
+		tasksSection.put(tasks.slice(1), done);
 	});
 
 	it('found value by start (with 1 field)', function(done) {
