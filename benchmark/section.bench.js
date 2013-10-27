@@ -101,5 +101,16 @@ describe('benchmark', function() {
 			done();
 		});
 	});
+
+	it('update document (from middle)', function(done) {
+		db.users.get({id: Math.round(docsCount / 2)}, function(err, doc) {
+			if (err) {done(err); return;}
+			doc.firstName += ' 1';
+			doc.occupation += ' 1';
+			doc.birthday += 1;
+			doc.cityOfBirt += ' 1';
+			db.users.put(doc, done);
+		});
+	});
 });
 
