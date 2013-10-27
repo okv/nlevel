@@ -75,12 +75,12 @@ function getTasks(projection, params) {
 			return getProjKey(task, projection) == sortIndex;
 		})[0];
 	});
-	params.start = getStrKey(params.start);
-	params.end = params.end ? getStrKey(params.end) : params.start;
-	params.end += DocsSection.prototype.end;
+	var start = getStrKey(params.start);
+	var end = params.end ? getStrKey(params.end) : start;
+	end += DocsSection.prototype.end;
 	newTasks = tasks.filter(function(task) {
 		var sortIndex = getProjKey(task, projection);
-		return sortIndex >= params.start && sortIndex <= params.end;
+		return sortIndex >= start && sortIndex <= end;
 	});
 	return newTasks;
 }
@@ -187,6 +187,7 @@ describe('documents section', function() {
 		var params = {start: {project: 'project 2'}};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
@@ -196,6 +197,7 @@ describe('documents section', function() {
 		var params = {start: {assignee: 'jane'}};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
 		});
@@ -205,6 +207,7 @@ describe('documents section', function() {
 		var params = {start: {project: 'project 3', version: '0.1'}};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
@@ -217,6 +220,7 @@ describe('documents section', function() {
 		};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
@@ -229,6 +233,7 @@ describe('documents section', function() {
 		};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
@@ -251,6 +256,7 @@ describe('documents section', function() {
 		};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
 		});
@@ -263,6 +269,7 @@ describe('documents section', function() {
 		};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
 		});
