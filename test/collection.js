@@ -3,8 +3,8 @@
 var expect = require('expect.js'),
 	levelup = require('level'),
 	fs = require('fs'),
-	ValBatch = require('../lib').ValBatch,
-	DocsBatch = require('../lib').DocsBatch;
+	ValSection = require('../lib').ValSection,
+	DocsSection = require('../lib').DocsSection;
 
 
 var dbPath = './testdb',
@@ -77,7 +77,7 @@ function getTasks(projection, params) {
 	});
 	params.start = getStrKey(params.start);
 	params.end = params.end ? getStrKey(params.end) : params.start;
-	params.end += DocsBatch.prototype.end;
+	params.end += DocsSection.prototype.end;
 	newTasks = tasks.filter(function(task) {
 		var sortIndex = getProjKey(task, projection);
 		return sortIndex >= params.start && sortIndex <= params.end;
@@ -86,41 +86,41 @@ function getTasks(projection, params) {
 }
 
 function getProjKey() {
-	return DocsBatch.prototype._getProjKey.apply(
+	return DocsSection.prototype._getProjKey.apply(
 		{prefix: 'prefix', separator: '~'}, arguments
 	);
 }
 
 function getStrKey() {
-	return DocsBatch.prototype._getStrKey.apply(
+	return DocsSection.prototype._getStrKey.apply(
 		{prefix: 'prefix', separator: '~'}, arguments
 	);
 }
 
-describe('value batch', function() {
-	var tasksBatch = null;
+describe('single value section', function() {
+	var tasksSection = null;
 
 	it('will not be created without db or prefix', function(done) {
 		expect(function() {
-			tasksBatch = new ValBatch();
+			tasksSection = new ValSection();
 		}).throwError('`db` for batch is not set');
 		expect(function() {
-			tasksBatch = new ValBatch(db);
+			tasksSection = new ValSection(db);
 		}).throwError('`prefix` for batch is not set');
 		done();
 	});
 
 	it('created without errors', function(done) {
-		tasksBatch = new ValBatch(db, 'tasks');
+		tasksSection = new ValSection(db, 'tasks');
 		done();
 	});
 
 	it('put key and value without errors', function(done) {
-		tasksBatch.put(tasks, done);
+		tasksSection.put(tasks, done);
 	});
 
 	it('got value by key', function(done) {
-		tasksBatch.get(function(err, data) {
+		tasksSection.get(function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(tasks);
 			done();
@@ -128,11 +128,11 @@ describe('value batch', function() {
 	});
 
 	it('del by key', function(done) {
-		tasksBatch.del(done);
+		tasksSection.del(done);
 	});
 
 	it('get by key returns NotFound error', function(done) {
-		tasksBatch.get(function(err) {
+		tasksSection.get(function(err) {
 			expect(err).have.property(
 				'message', 'Key not found in database [tasks]'
 			);
@@ -141,22 +141,22 @@ describe('value batch', function() {
 	});
 });
 
-describe('projected batch', function() {
-	var tasksBatch = null,
+describe('documents section', function() {
+	var tasksSection = null,
 		taskProjs = [
 			['project', 'version', 'assignee', 'id'],
 			['assignee', 'project', 'version', 'id']
 		];
 
 	it('created without errors', function(done) {
-		tasksBatch = new DocsBatch(db, 'tasks', {projections: taskProjs});
+		tasksSection = new DocsSection(db, 'tasks', {projections: taskProjs});
 		done();
 	});
 
 	it('put key and value without errors', function(done) {
 		var putCount = 0;
 		tasks.forEach(function(task) {
-			tasksBatch.put(task, function() {
+			tasksSection.put(task, function() {
 				putCount++;
 				if (putCount == tasks.length) done();
 			});
@@ -165,7 +165,7 @@ describe('projected batch', function() {
 
 	it('found value by start (with 1 field)', function(done) {
 		var params = {start: {project: 'project 2'}};
-		tasksBatch.find(params, function(err, data) {
+		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
@@ -174,7 +174,7 @@ describe('projected batch', function() {
 
 	it('found value by start (with 1 field) using 2 projection', function(done) {
 		var params = {start: {assignee: 'jane'}};
-		tasksBatch.find(params, function(err, data) {
+		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
@@ -183,7 +183,7 @@ describe('projected batch', function() {
 
 	it('found value by start (with 2 field)', function(done) {
 		var params = {start: {project: 'project 3', version: '0.1'}};
-		tasksBatch.find(params, function(err, data) {
+		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
@@ -195,7 +195,7 @@ describe('projected batch', function() {
 			start: {project: 'project 1'},
 			end: {project: 'project 2'}
 		};
-		tasksBatch.find(params, function(err, data) {
+		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
@@ -207,7 +207,7 @@ describe('projected batch', function() {
 			start: {project: 'project 3', version: '0.1'},
 			end: {project: 'project 3', version: '0.2'}
 		};
-		tasksBatch.find(params, function(err, data) {
+		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
@@ -218,7 +218,7 @@ describe('projected batch', function() {
 		var task = tasks.pop();
 		task.project = 'project 1';
 		tasks.splice(0, 0, task);
-		tasksBatch.put(task, function(err, data) {
+		tasksSection.put(task, function(err, data) {
 			if (err) {done(err); return;}
 			done();
 		});
@@ -229,7 +229,7 @@ describe('projected batch', function() {
 			start: {project: 'project 1'},
 			end: {project: 'project 3'}
 		};
-		tasksBatch.find(params, function(err, data) {
+		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(getTasks(taskProjs[0], params));
 			done();
@@ -241,7 +241,7 @@ describe('projected batch', function() {
 			start: {assignee: 'sam', project: 'project 1'},
 			end: {assignee: 'sam', project: 'project 3'}
 		};
-		tasksBatch.find(params, function(err, data) {
+		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
