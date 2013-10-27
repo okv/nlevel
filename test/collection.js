@@ -72,13 +72,13 @@ function getTasks(projection, params) {
 		return getProjKey(task, projection);
 	}).sort().map(function(sortIndex) {
 		return tasks.filter(function(task) {
-			return getProjKey(task, projection) == sortIndex;
+			return getProjKey(task, projection) === sortIndex;
 		})[0];
 	});
 	var start = getStrKey(params.start);
 	var end = params.end ? getStrKey(params.end) : start;
 	end += DocsSection.prototype.end;
-	newTasks = tasks.filter(function(task) {
+	newTasks = newTasks.filter(function(task) {
 		var sortIndex = getProjKey(task, projection);
 		return sortIndex >= start && sortIndex <= end;
 	});
@@ -283,27 +283,26 @@ describe('documents section', function() {
 		});
 	});
 
-	// it('delete', function(done) {
-	// 	var params = {start: {project: 'project 1'}};
-	// 	tasksSection.find(params, function(err, data) {
-	// 		if (err) {done(err); return;}
-	// 		expect(data.length).greaterThan(0);
-	// 		tasksSection.del(data, function() {
-	// 			getTasks(taskProjs[1], params).forEach(function(task) {
-	// 				for (var i = 0; i < tasks.length; i++) {
-	// 					if (task.id == tasks[i].id) {
-	// 						tasks.splice(i, 1);
-	// 						break;
-	// 					}
-	// 				}
-	// 			});
-	// 			tasksSection.find({}, function(err, data) {
-	// 				console.log('>>>> data = ', data)
-	// 				if (err) {done(err); return;}
-	// 				expect(data).eql(tasks);
-	// 				done();
-	// 			});
-	// 		});
-	// 	});
-	// });
+	it('delete', function(done) {
+		var params = {start: {project: 'project 2'}};
+		tasksSection.find(params, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
+			tasksSection.del(data, function() {
+				getTasks(taskProjs[0], params).forEach(function(task) {
+					for (var i = 0; i < tasks.length; i++) {
+						if (task.id == tasks[i].id) {
+							tasks.splice(i, 1);
+							break;
+						}
+					}
+				});
+				tasksSection.find({}, function(err, data) {
+					if (err) {done(err); return;}
+					expect(data).eql(getTasks(['id'], {start: {id: ''}}));
+					done();
+				});
+			});
+		});
+	});
 });
