@@ -153,6 +153,28 @@ describe('documents section', function() {
 		done();
 	});
 
+	it('doesn`t allow put document without id', function(done) {
+		tasksSection.put(
+			[tasks[0], {user: 'user'}].concat(tasks.slice(1)),
+			function(err) {
+				expect(err.message).equal(
+					'Document doesn`t have `id`: {"user":"user"}'
+				);
+				done();
+			}
+		);
+	});
+
+	it('doesn`t allow put non document value', function(done) {
+		tasksSection.put(
+			[tasks[0], 1].concat(tasks.slice(1)),
+			function(err) {
+				expect(err.message).equal('Document should be an `object`: 1');
+				done();
+			}
+		);
+	});
+
 	it('put single doc without errors', function(done) {
 		tasksSection.put(tasks[0], done);
 	});
