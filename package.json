@@ -11,7 +11,8 @@
 		"leveldb", "level", "store", "storage", "db", "database", "in-process", "sqlight"
 	],
 	"scripts": {
-		"test": "mocha test --reporter spec --bail --async-only"
+		"test": "mocha test --reporter spec --bail --async-only",
+		"benchmark": "mocha benchmark/*.bench.js --reporter spec --bail --async-only --slow 1 --timeout 30000"
 	},
 	"dependencies": {
 	},
