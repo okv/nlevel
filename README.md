@@ -3,7 +3,7 @@
 nlevel - node.js odm for leveldb.
 It is built on top of [levelup](https://github.com/rvagg/node-levelup).
 The main ideas are to split db on sections (like collections in mongodb)
-and provides additional operations for this sections including manipulation with
+and provide additional operations for this sections including manipulation with
 sets of objects.
 
 
