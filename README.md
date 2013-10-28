@@ -38,7 +38,7 @@ db.cities.put(['Elina', 'Dillon', 'Saundra', 'Harmony'], function(err) {
 });
 
 
-// create documents section with projections
+// create documents section with projections (key order matters)
 db.tasks = new nlevel.DocsSection(ldb, 'tasks', {
 	projections: [
 		// projection 1
@@ -85,8 +85,11 @@ db.tasks.put([{
 	project: 'project 3',
 	version: '0.2',
 	assignee: 'sam'
-}], function(err, tasks) {
+}], function(err) {
 	if (err) throw err;
+
+	// NOTICE: in all calls key order matters
+
 	// find task for selected assignee and project (it uses projection 2)
 	db.tasks.find({
 		start: {assignee: 'jane', project: 'project 2'}
@@ -103,7 +106,7 @@ db.tasks.put([{
 		// prints [ 1, 2 ]
 		console.log(tasks.map(function(task) {return task.id;}));
 	});
-	// get by full key
+	// get by full key (it uses projection 1)
 	db.tasks.get({
 		project: 'project 1',
 		version: '1.0.0',
