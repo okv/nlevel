@@ -26,41 +26,17 @@ describe('bootstrap', function() {
 });
 
 var tasks = [{
-	id: 1,
-	title: 'Task 1 at project 1',
-	project: 'project 1',
-	version: '1.0.0',
-	assignee: 'bob'
+	id: 1, project: 'proj 1', version: '1.0.0', assignee: 'bob', done: true
 }, {
-	id: 2,
-	title: 'Task 2 at project 1',
-	project: 'project 1',
-	version: '1.0.0',
-	assignee: 'jane'
+	id: 2, project: 'proj 1', version: '1.0.0', assignee: 'jane', done: false
 }, {
-	id: 3,
-	title: 'Task 1 at project 2',
-	project: 'project 2',
-	version: '2.0',
-	assignee: 'bob'
+	id: 3, project: 'proj 2', version: '2.0', assignee: 'bob', done: true
 }, {
-	id: 4,
-	title: 'Task 2 at project 2',
-	project: 'project 2',
-	version: '2.0',
-	assignee: 'jane'
+	id: 4, project: 'proj 2', version: '2.0', assignee: 'jane', done: true
 }, {
-	id: 5,
-	title: 'Task 1 at project 3',
-	project: 'project 3',
-	version: '0.1',
-	assignee: 'sam'
+	id: 5, project: 'proj 3', version: '0.1', assignee: 'sam', done: true
 }, {
-	id: 6,
-	title: 'Task 2 at project 3',
-	project: 'project 3',
-	version: '0.2',
-	assignee: 'sam'
+	id: 6, project: 'proj 3', version: '0.2', assignee: 'sam', done: false
 }];
 
 function getTasks(projection, params) {
@@ -142,7 +118,10 @@ describe('documents section', function() {
 	var tasksSection = null,
 		taskProjs = [
 			{key: {project: 1, version: 1, assignee: 1, id: 1}},
-			{key: {assignee: 1, project: 1, version: 1, id: 1}}
+			{key: {assignee: 1, project: 1, version: 1, id: 1}},
+			{key: {done: function(doc) {
+				return Number(doc.done);
+			}, assignee: 1, id: 1}}
 		];
 
 	it('created without errors', function(done) {
@@ -181,7 +160,7 @@ describe('documents section', function() {
 	});
 
 	it('found value by start (with 1 field)', function(done) {
-		var params = {start: {project: 'project 2'}};
+		var params = {start: {project: 'proj 2'}};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
@@ -201,7 +180,7 @@ describe('documents section', function() {
 	});
 
 	it('found value by start (with 2 field)', function(done) {
-		var params = {start: {project: 'project 3', version: '0.1'}};
+		var params = {start: {project: 'proj 3', version: '0.1'}};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
@@ -212,8 +191,8 @@ describe('documents section', function() {
 
 	it('found value by start and end  (with 1 field)', function(done) {
 		var params = {
-			start: {project: 'project 1'},
-			end: {project: 'project 2'}
+			start: {project: 'proj 1'},
+			end: {project: 'proj 2'}
 		};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
@@ -225,13 +204,23 @@ describe('documents section', function() {
 
 	it('found value by start and end (with 2 field)', function(done) {
 		var params = {
-			start: {project: 'project 3', version: '0.1'},
-			end: {project: 'project 3', version: '0.2'}
+			start: {project: 'proj 3', version: '0.1'},
+			end: {project: 'proj 3', version: '0.2'}
 		};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[0], params));
+			done();
+		});
+	});
+
+	it('found value with key which contains function', function(done) {
+		var params = {start: {done: 0}};
+		tasksSection.find(params, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
+			expect(data).eql(getTasks(taskProjs[2], params));
 			done();
 		});
 	});
@@ -246,7 +235,7 @@ describe('documents section', function() {
 
 	it('update document (put existsing one) without errors', function(done) {
 		var task = tasks.pop();
-		task.project = 'project 1';
+		task.project = 'proj 1';
 		tasks.splice(0, 0, task);
 		tasksSection.put(task, function(err, data) {
 			if (err) {done(err); return;}
@@ -256,8 +245,8 @@ describe('documents section', function() {
 
 	it('check that docs updated via 1 projection', function(done) {
 		var params = {
-			start: {project: 'project 1'},
-			end: {project: 'project 3'}
+			start: {project: 'proj 1'},
+			end: {project: 'proj 3'}
 		};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
@@ -269,8 +258,8 @@ describe('documents section', function() {
 
 	it('check that docs updated via 2 projection', function(done) {
 		var params = {
-			start: {assignee: 'sam', project: 'project 1'},
-			end: {assignee: 'sam', project: 'project 3'}
+			start: {assignee: 'sam', project: 'proj 1'},
+			end: {assignee: 'sam', project: 'proj 3'}
 		};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
@@ -281,7 +270,7 @@ describe('documents section', function() {
 	});
 
 	it('delete', function(done) {
-		var params = {start: {project: 'project 2'}};
+		var params = {start: {project: 'proj 2'}};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
