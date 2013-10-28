@@ -24,10 +24,10 @@ describe('benchmark', function() {
 			});
 			db = {
 				users: new lib.DocsSection(ldb, 'users', {projections: [
-					{key: ['firstName', 'lastName', 'id']},
-					{key: ['birthday', 'id']},
-					{key: ['cityOfBirt', 'occupation', 'birthday', 'id']},
-					{key: ['occupation', 'birthday', 'id']}
+					{key: {firstName: 1, lastName: 1, id: 1}},
+					{key: {birthday: 1, id: 1}},
+					{key: {cityOfBirt: 1, occupation: 1, birthday: 1, id: 1}},
+					{key: {occupation: 1, birthday: 1, id: 1}}
 				]})
 			};
 			done();

@@ -42,9 +42,9 @@ db.cities.put(['Elina', 'Dillon', 'Saundra', 'Harmony'], function(err) {
 db.tasks = new nlevel.DocsSection(ldb, 'tasks', {
 	projections: [
 		// projection 1
-		{key: ['project', 'version', 'assignee', 'id']},
+		{key: {project: 1, version: 1, assignee: 1, id: 1}},
 		// projection 2
-		{key: ['assignee', 'project', 'version', 'id']}
+		{key: {assignee: 1, project: 1, version: 1, id: 1}}
 	]
 });
 

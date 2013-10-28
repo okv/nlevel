@@ -141,8 +141,8 @@ describe('single value section', function() {
 describe('documents section', function() {
 	var tasksSection = null,
 		taskProjs = [
-			{key: ['project', 'version', 'assignee', 'id']},
-			{key: ['assignee', 'project', 'version', 'id']}
+			{key: {project: 1, version: 1, assignee: 1, id: 1}},
+			{key: {assignee: 1, project: 1, version: 1, id: 1}}
 		];
 
 	it('created without errors', function(done) {
@@ -239,7 +239,7 @@ describe('documents section', function() {
 	it('without condition found all', function(done) {
 		tasksSection.find({start: {id: ''}}, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql(getTasks({key: ['id']}, {start: {id: ''}}));
+			expect(data).eql(getTasks({key: {id: 1}}, {start: {id: ''}}));
 			done();
 		});
 	});
@@ -296,7 +296,7 @@ describe('documents section', function() {
 				});
 				tasksSection.find({}, function(err, data) {
 					if (err) {done(err); return;}
-					expect(data).eql(getTasks({key: ['id']}, {start: {id: ''}}));
+					expect(data).eql(getTasks({key: {id: 1}}, {start: {id: ''}}));
 					done();
 				});
 			});
