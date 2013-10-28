@@ -15,11 +15,11 @@
 		"benchmark": "mocha benchmark/*.bench.js --reporter spec --bail --async-only --slow 1 --timeout 30000"
 	},
 	"dependencies": {
+		"level": "0.17.0-1"
 	},
 	"devDependencies": {
 		"mocha": "1.11.0",
-		"expect.js": "0.2.0",
-		"level": "0.17.0-1"
+		"expect.js": "0.2.0"
 	},
 	 "main": "./lib/index"
 }

@@ -22,15 +22,14 @@ describe('benchmark', function() {
 		function createDb(err) {
 			if (err) {done(err); return;}
 			var ldb = levelup(dbPath, {
-				keyEncoding: 'json',
 				valueEncoding: 'json'
 			});
 			db = {
 				users: new DocsSection(ldb, 'users', {projections: [
-					['firstName', 'lastName', 'id'],
-					['birthday', 'id'],
-					['cityOfBirt', 'occupation', 'birthday', 'id'],
-					['occupation', 'birthday', 'id']
+					{key: ['firstName', 'lastName', 'id']},
+					{key: ['birthday', 'id']},
+					{key: ['cityOfBirt', 'occupation', 'birthday', 'id']},
+					{key: ['occupation', 'birthday', 'id']}
 				]})
 			};
 			done();

@@ -20,7 +20,6 @@ describe('bootstrap', function() {
 		function createDb(err) {
 			if (err) {done(err); return;}
 			db = levelup(dbPath, {
-				keyEncoding: 'json',
 				valueEncoding: 'json'
 			});
 			done();
@@ -144,8 +143,8 @@ describe('single value section', function() {
 describe('documents section', function() {
 	var tasksSection = null,
 		taskProjs = [
-			['project', 'version', 'assignee', 'id'],
-			['assignee', 'project', 'version', 'id']
+			{key: ['project', 'version', 'assignee', 'id']},
+			{key: ['assignee', 'project', 'version', 'id']}
 		];
 
 	it('created without errors', function(done) {
@@ -242,7 +241,7 @@ describe('documents section', function() {
 	it('without condition found all', function(done) {
 		tasksSection.find({start: {id: ''}}, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql(getTasks(['id'], {start: {id: ''}}));
+			expect(data).eql(getTasks({key: ['id']}, {start: {id: ''}}));
 			done();
 		});
 	});
@@ -299,7 +298,7 @@ describe('documents section', function() {
 				});
 				tasksSection.find({}, function(err, data) {
 					if (err) {done(err); return;}
-					expect(data).eql(getTasks(['id'], {start: {id: ''}}));
+					expect(data).eql(getTasks({key: ['id']}, {start: {id: ''}}));
 					done();
 				});
 			});
