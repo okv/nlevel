@@ -1,10 +1,8 @@
 'use strict';
 
 var expect = require('expect.js'),
-	levelup = require('level'),
 	fs = require('fs'),
-	ValSection = require('../lib').ValSection,
-	DocsSection = require('../lib').DocsSection;
+	lib = require('../lib');
 
 
 var dbPath = './testdb',
@@ -13,13 +11,13 @@ var dbPath = './testdb',
 describe('bootstrap', function() {
 	it('remove previous and create new test db', function(done) {
 		if (fs.existsSync(dbPath)) {
-			levelup.destroy(dbPath, createDb);
+			lib.db.destroy(dbPath, createDb);
 		} else {
 			createDb();
 		}
 		function createDb(err) {
 			if (err) {done(err); return;}
-			db = levelup(dbPath, {
+			db = lib.db(dbPath, {
 				valueEncoding: 'json'
 			});
 			done();
@@ -76,7 +74,7 @@ function getTasks(projection, params) {
 	});
 	var start = getStrKey(params.start);
 	var end = params.end ? getStrKey(params.end) : start;
-	end += DocsSection.prototype.end;
+	end += lib.DocsSection.prototype.end;
 	newTasks = newTasks.filter(function(task) {
 		var sortIndex = getProjKey(task, projection);
 		return sortIndex >= start && sortIndex <= end;
@@ -85,13 +83,13 @@ function getTasks(projection, params) {
 }
 
 function getProjKey() {
-	return DocsSection.prototype._getProjKey.apply(
+	return lib.DocsSection.prototype._getProjKey.apply(
 		{name: 'name', separator: '~'}, arguments
 	);
 }
 
 function getStrKey() {
-	return DocsSection.prototype._getStrKey.apply(
+	return lib.DocsSection.prototype._getStrKey.apply(
 		{name: 'name', separator: '~'}, arguments
 	);
 }
@@ -101,16 +99,16 @@ describe('single value section', function() {
 
 	it('will not be created without db or name', function(done) {
 		expect(function() {
-			tasksSection = new ValSection();
+			tasksSection = new lib.ValSection();
 		}).throwError('`db` for batch is not set');
 		expect(function() {
-			tasksSection = new ValSection(db);
+			tasksSection = new lib.ValSection(db);
 		}).throwError('`name` for batch is not set');
 		done();
 	});
 
 	it('created without errors', function(done) {
-		tasksSection = new ValSection(db, 'tasks');
+		tasksSection = new lib.ValSection(db, 'tasks');
 		done();
 	});
 
@@ -148,7 +146,7 @@ describe('documents section', function() {
 		];
 
 	it('created without errors', function(done) {
-		tasksSection = new DocsSection(db, 'tasks', {projections: taskProjs});
+		tasksSection = new lib.DocsSection(db, 'tasks', {projections: taskProjs});
 		done();
 	});
 

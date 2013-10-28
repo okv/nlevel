@@ -1,10 +1,8 @@
 'use strict';
 
 var	expect = require('expect.js'),
-	levelup = require('level'),
 	fs = require('fs'),
-	ValSection = require('../lib').ValSection,
-	DocsSection = require('../lib').DocsSection,
+	lib = require('../lib'),
 	generate = require('./gendata').generate;
 
 
@@ -15,17 +13,17 @@ var dbPath = './testdb',
 describe('benchmark', function() {
 	it('remove previous and create new test db', function(done) {
 		if (fs.existsSync(dbPath)) {
-			levelup.destroy(dbPath, createDb);
+			lib.db.destroy(dbPath, createDb);
 		} else {
 			createDb();
 		}
 		function createDb(err) {
 			if (err) {done(err); return;}
-			var ldb = levelup(dbPath, {
+			var ldb = lib.db(dbPath, {
 				valueEncoding: 'json'
 			});
 			db = {
-				users: new DocsSection(ldb, 'users', {projections: [
+				users: new lib.DocsSection(ldb, 'users', {projections: [
 					{key: ['firstName', 'lastName', 'id']},
 					{key: ['birthday', 'id']},
 					{key: ['cityOfBirt', 'occupation', 'birthday', 'id']},
