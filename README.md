@@ -102,4 +102,28 @@ db.tasks.put([{
 
 ## Sections api
 
-coming soon...
+### ValSection()
+
+  Value section constructor accepts `db`, `name` and returns instance of section
+
+### ValSection.put(value:Any, [callback(err)]:Function)
+
+  Put value to section accepts
+
+### ValSection.get(callback(err,value):Function)
+
+  Get value from section
+
+### ValSection.del([callback(err)]:Function)
+
+  Delete value from section
+
+
+
+## Run tests
+
+into cloned repository run
+
+```
+npm test
+```
