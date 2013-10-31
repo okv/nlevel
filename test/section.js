@@ -39,7 +39,33 @@ var tasks = [{
 	id: 6, project: 'proj 3', version: '0.2', assignee: 'sam', done: false
 }];
 
+var taskProjs = [
+	{key: {id: 1}},
+	{key: {project: 1, version: 1, assignee: 1, id: 1}},
+	{key: {assignee: 1, project: 1, version: 1, id: 1}},
+	{key: {done: function(doc) {
+		return Number(doc.done);
+	}, assignee: 1, id: 1}}
+];
+
+lib.DocsSection.prototype._calcProjectionIds.call({projections: taskProjs});
+
 function getTasks(projection, params) {
+	var context = {
+		name: 'name',
+		separator: '~',
+		projections: taskProjs,
+		_determineProjection: lib.DocsSection.prototype._determineProjection
+	};
+
+	function getStrKey() {
+		return lib.DocsSection.prototype._getStrKey.apply(context, arguments);
+	}
+
+	function getProjKey() {
+		return lib.DocsSection.prototype._getProjKey.apply(context, arguments);
+	}
+
 	var sortIndexHash = {};
 	var newTasks = tasks.map(function(task) {
 		return getProjKey(task, projection);
@@ -48,26 +74,14 @@ function getTasks(projection, params) {
 			return getProjKey(task, projection) === sortIndex;
 		})[0];
 	});
-	var start = getStrKey(params.start);
-	var end = params.end ? getStrKey(params.end) : start;
+	var start = getStrKey(params.start, projection.id);
+	var end = params.end ? getStrKey(params.end, projection.id) : start;
 	end += lib.DocsSection.prototype.end;
 	newTasks = newTasks.filter(function(task) {
 		var sortIndex = getProjKey(task, projection);
 		return sortIndex >= start && sortIndex <= end;
 	});
 	return newTasks;
-}
-
-function getProjKey() {
-	return lib.DocsSection.prototype._getProjKey.apply(
-		{name: 'name', separator: '~'}, arguments
-	);
-}
-
-function getStrKey() {
-	return lib.DocsSection.prototype._getStrKey.apply(
-		{name: 'name', separator: '~'}, arguments
-	);
 }
 
 describe('single value section', function() {
@@ -115,14 +129,7 @@ describe('single value section', function() {
 });
 
 describe('documents section', function() {
-	var tasksSection = null,
-		taskProjs = [
-			{key: {project: 1, version: 1, assignee: 1, id: 1}},
-			{key: {assignee: 1, project: 1, version: 1, id: 1}},
-			{key: {done: function(doc) {
-				return Number(doc.done);
-			}, assignee: 1, id: 1}}
-		];
+	var tasksSection = null;
 
 	it('created without errors', function(done) {
 		tasksSection = new lib.DocsSection(db, 'tasks', {projections: taskProjs});
@@ -164,7 +171,7 @@ describe('documents section', function() {
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[0], params));
+			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
 		});
 	});
@@ -174,7 +181,7 @@ describe('documents section', function() {
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[1], params));
+			expect(data).eql(getTasks(taskProjs[2], params));
 			done();
 		});
 	});
@@ -184,7 +191,7 @@ describe('documents section', function() {
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[0], params));
+			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
 		});
 	});
@@ -197,7 +204,7 @@ describe('documents section', function() {
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[0], params));
+			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
 		});
 	});
@@ -210,7 +217,7 @@ describe('documents section', function() {
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[0], params));
+			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
 		});
 	});
@@ -220,15 +227,15 @@ describe('documents section', function() {
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[2], params));
+			expect(data).eql(getTasks(taskProjs[3], params));
 			done();
 		});
 	});
 
 	it('without condition found all', function(done) {
-		tasksSection.find({start: {id: ''}}, function(err, data) {
+		tasksSection.find({}, function(err, data) {
 			if (err) {done(err); return;}
-			expect(data).eql(getTasks({key: {id: 1}}, {start: {id: ''}}));
+			expect(data).eql(getTasks(taskProjs[0], {start: {id: ''}}));
 			done();
 		});
 	});
@@ -251,7 +258,7 @@ describe('documents section', function() {
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[0], params));
+			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
 		});
 	});
@@ -264,7 +271,7 @@ describe('documents section', function() {
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[1], params));
+			expect(data).eql(getTasks(taskProjs[2], params));
 			done();
 		});
 	});
@@ -275,7 +282,7 @@ describe('documents section', function() {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
 			tasksSection.del(data, function() {
-				getTasks(taskProjs[0], params).forEach(function(task) {
+				getTasks(taskProjs[1], params).forEach(function(task) {
 					for (var i = 0; i < tasks.length; i++) {
 						if (task.id == tasks[i].id) {
 							tasks.splice(i, 1);
@@ -285,7 +292,7 @@ describe('documents section', function() {
 				});
 				tasksSection.find({}, function(err, data) {
 					if (err) {done(err); return;}
-					expect(data).eql(getTasks({key: {id: 1}}, {start: {id: ''}}));
+					expect(data).eql(getTasks(taskProjs[0], {start: {id: ''}}));
 					done();
 				});
 			});
