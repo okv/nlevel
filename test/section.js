@@ -43,6 +43,9 @@ var taskProjs = [
 	{key: {id: 1}},
 	{key: {project: 1, version: 1, assignee: 1, id: 1}},
 	{key: {assignee: 1, project: 1, version: 1, id: 1}},
+	{key: {assignee: 1, project: 1, version: 1, id: 1}, value: function(doc) {
+		return {id: doc.id};
+	}, id: 'assignee-project-version-id-returns-id'},
 	{key: {done: function(doc) {
 		return Number(doc.done);
 	}, assignee: 1, id: 1}}
@@ -50,7 +53,7 @@ var taskProjs = [
 
 lib.DocsSection.prototype._calcProjectionIds.call({projections: taskProjs});
 
-function getTasks(projection, params) {
+function getTasks(projection, params, outFields) {
 	var context = {
 		name: 'name',
 		separator: '~',
@@ -80,6 +83,13 @@ function getTasks(projection, params) {
 	newTasks = newTasks.filter(function(task) {
 		var sortIndex = getProjKey(task, projection);
 		return sortIndex >= start && sortIndex <= end;
+	});
+	if (outFields) newTasks = newTasks.map(function(task) {
+		var newTask = {};
+		outFields.forEach(function(field) {
+			newTask[field] = task[field];
+		});
+		return newTask;
 	});
 	return newTasks;
 }
@@ -132,7 +142,9 @@ describe('documents section', function() {
 	var tasksSection = null;
 
 	it('created without errors', function(done) {
-		tasksSection = new lib.DocsSection(db, 'tasks', {projections: taskProjs});
+		tasksSection = new lib.DocsSection(db, 'tasks', {
+			projections: taskProjs.slice(1)
+		});
 		done();
 	});
 
@@ -166,7 +178,7 @@ describe('documents section', function() {
 		tasksSection.put(tasks.slice(1), done);
 	});
 
-	it('found value by start (with 1 field)', function(done) {
+	it('found value by start', function(done) {
 		var params = {start: {project: 'proj 2'}};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
@@ -176,12 +188,25 @@ describe('documents section', function() {
 		});
 	});
 
-	it('found value by start (with 1 field) using 2 projection', function(done) {
+	it('found value by start using another projection', function(done) {
 		var params = {start: {assignee: 'jane'}};
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[2], params));
+			done();
+		});
+	});
+
+	it('found value by selected projection which returns only ids', function(done) {
+		var params = {
+			by: 'assignee-project-version-id-returns-id',
+			start: {assignee: 'jane'}
+		};
+		tasksSection.find(params, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
+			expect(data).eql(getTasks(taskProjs[3], params, ['id']));
 			done();
 		});
 	});
@@ -227,7 +252,7 @@ describe('documents section', function() {
 		tasksSection.find(params, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[3], params));
+			expect(data).eql(getTasks(taskProjs[4], params));
 			done();
 		});
 	});
