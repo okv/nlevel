@@ -118,6 +118,45 @@ db.tasks.put([{
 
   Delete value from section
 
+### DocsSection()
+
+  Documents section stores objects in different projections. Constructor
+  accepts `db`, `name` of section and `options`, `options.projections` is a
+  list of target projections in which documents will be stored.
+  Each projection defines `key` by which document will be accessible and
+  `value` which is the presentation of document for projection. `key` is an
+  object of field names and values for them. If value of key field is a
+  function object will be passed to it and it should return string key
+  otherwise value for this key from object will be get. If `value` is a
+  function it will accept object and should return new object which will be
+  stored for this projection. Any document should have an unique identifier - 
+  `id` field. Projection keys stores in alphabetical order and you can easily
+  find documents (their presentations) between [start..end] (see `find` method
+  api). Each document will have one key for each projection because of that
+  you usually should put `id` field as last for projection. Field order at
+  `key` object (and at `find`) matters.
+
+### DocsSection.put(docs:Object|Object[], [callback(err)]:Function)
+
+  Put one or array of documents to the section
+
+### DocsSection.find(params:Object, [callback(err,docs)]:Function)
+
+  Find documents
+  
+  - `params.by` - id of projection to use, by default it detects projection
+  using condition (start, end)
+  - `params.start` - start key
+  - `params.end` - end key, by default it equals to `params.start` (with added
+  boundary symbol)
+
+### DocsSection.get(key:Object, [callback(err,doc)]:Function)
+
+  Get document by full key
+
+### DocsSection.del(ids:String[]|Object[], [callback(err)]:Function)
+
+  Delete documents by array of their ids or array of objects with `id` field
 
 
 ## Run tests
