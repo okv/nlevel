@@ -282,12 +282,42 @@ describe('documents section', function() {
 	});
 
 	it('update document (put existsing one) without errors', function(done) {
-		var task = tasks.pop();
+		var task = tasks[tasks.length - 1];
 		task.project = 'proj 1';
-		tasks.splice(0, 0, task);
-		tasksSection.put(task, function(err, data) {
+		tasksSection.put(task, function(err) {
 			if (err) {done(err); return;}
 			done();
+		});
+	});
+
+	it('update document (with update and object) without errors', function(done) {
+		var task = tasks[tasks.length - 1],
+			assignee = 'jane';
+		task.assignee = assignee;
+		tasksSection.update({id: task.id}, {assignee: assignee}, function(err) {
+			if (err) {done(err); return;}
+			tasksSection.get({id: task.id}, function(err, doc) {
+				if (err) {done(err); return;}
+				expect(doc).eql(task);
+				done();
+			});
+		});
+	});
+
+	it('update document (with update and function) without errors', function(done) {
+		var task = tasks[tasks.length - 1],
+			version = '0.3';
+		task.version = version;
+		tasksSection.update({id: task.id}, function(doc) {
+			doc.version = version;
+			return doc;
+		}, function(err) {
+			if (err) {done(err); return;}
+			tasksSection.get({id: task.id}, function(err, doc) {
+				if (err) {done(err); return;}
+				expect(doc).eql(task);
+				done();
+			});
 		});
 	});
 
