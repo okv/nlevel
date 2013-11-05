@@ -234,6 +234,22 @@ describe('documents section', function() {
 		});
 	});
 
+	it('found value by start and end with filter', function(done) {
+		var params = {
+			start: {project: 'proj 1'},
+			end: {project: 'proj 2'},
+			filter: function(doc) {
+				return doc.project === 'proj 1';
+			}
+		};
+		tasksSection.find(params, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data.length).greaterThan(0);
+			expect(data).eql(getTasks(taskProjs[1], {start: params.start}));
+			done();
+		});
+	});
+
 	it('found value by start and end (with 2 field)', function(done) {
 		var params = {
 			start: {project: 'proj 3', version: '0.1'},
