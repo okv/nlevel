@@ -156,6 +156,18 @@ db.tasks.put([{
 
   Get document by full key
 
+### DocsSection.update(key:Object, modifier:Object|Function, [callback(err)]:Function)
+
+  Update document by `key` using `modifier` which could object of fields and 
+  values to be updated or function which accepts document and returns modified
+  document
+
+### DocsSection.multiUpdate(findParams:Object, modifier:Object|Function, [callback(err)]:Function)
+
+  Find documents using `findParams` (see `find`) and update them using
+  `modifier` (see `modifier` description at `update`)
+  document
+
 ### DocsSection.del(ids:String[]|Object[], [callback(err)]:Function)
 
   Delete documents by array of their ids or array of objects with `id` field

@@ -321,6 +321,28 @@ describe('documents section', function() {
 		});
 	});
 
+	it('update documents using multi update without errors', function(done) {
+		var task1 = tasks[0],
+			task2 = tasks[1],
+			version = '0.44',
+			findParams = {filter: function(doc) {
+				return doc.id === task1.id || doc.id === task2.id;
+			}};
+		task1.version = version;
+		task2.version = version;
+		tasksSection.multiUpdate(findParams, function(doc) {
+			doc.version = version;
+			return doc;
+		}, function(err) {
+			if (err) {done(err); return;}
+			tasksSection.find(findParams, function(err, docs) {
+				if (err) {done(err); return;}
+				expect(docs).eql([task1, task2]);
+				done();
+			});
+		});
+	});
+
 	it('check that docs updated via 1 projection', function(done) {
 		var params = {
 			start: {project: 'proj 1'},
