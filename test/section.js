@@ -333,8 +333,9 @@ describe('documents section', function() {
 		tasksSection.multiUpdate(findParams, function(doc) {
 			doc.version = version;
 			return doc;
-		}, function(err) {
+		}, function(err, updatedCount) {
 			if (err) {done(err); return;}
+			expect(updatedCount).equal(2);
 			tasksSection.find(findParams, function(err, docs) {
 				if (err) {done(err); return;}
 				expect(docs).eql([task1, task2]);

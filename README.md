@@ -162,10 +162,11 @@ db.tasks.put([{
   values to be updated or function which accepts document and returns modified
   document
 
-### DocsSection.multiUpdate(findParams:Object, modifier:Object|Function, [callback(err)]:Function)
+### DocsSection.multiUpdate(findParams:Object, modifier:Object|Function, [callback(err,updatedCount)]:Function)
 
   Find documents using `findParams` (see `find`) and update them using
-  `modifier` (see `modifier` description at `update`)
+  `modifier` (see `modifier` description at `update`). Count of updated
+  documents will be passed to `callback` (it could be zero).
   document
 
 ### DocsSection.del(ids:String[]|Object[], [callback(err)]:Function)
