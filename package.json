@@ -16,7 +16,7 @@
 		"mkapidoc": "dox --api < lib/index.js | sed -e 's/##/###/g'"
 	},
 	"dependencies": {
-		"level": "0.17.0-1"
+		"level": "0.18.0"
 	},
 	"devDependencies": {
 		"mocha": "1.11.0",
