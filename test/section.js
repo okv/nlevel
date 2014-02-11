@@ -91,6 +91,7 @@ function getTasks(projection, params, outFields) {
 		});
 		return newTask;
 	});
+	if (params.reverse) newTasks = newTasks.reverse();
 	return newTasks;
 }
 
@@ -277,6 +278,17 @@ describe('documents section', function() {
 		tasksSection.find({}, function(err, data) {
 			if (err) {done(err); return;}
 			expect(data).eql(getTasks(taskProjs[0], {start: {id: ''}}));
+			done();
+		});
+	});
+
+	it('found reversed values with reverse: true', function(done) {
+		tasksSection.find({reverse: true}, function(err, data) {
+			if (err) {done(err); return;}
+			expect(data).eql(getTasks(taskProjs[0], {
+				start: {id: ''},
+				reverse: true
+			}));
 			done();
 		});
 	});

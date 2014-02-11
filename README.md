@@ -149,6 +149,7 @@ db.tasks.put([{
   - `params.start` - start key
   - `params.end` - end key, by default it equals to `params.start` (with added
   boundary symbol)
+  - `params.reverse` - a boolean, set to true if you want to go in reverse order
   - `params.filter` - function(value) if it returns falsy value document will be
   excluded from result
 
