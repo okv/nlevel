@@ -13,7 +13,7 @@
 	"scripts": {
 		"test": "mocha test --reporter spec --bail --async-only",
 		"benchmark": "mocha benchmark/*.bench.js --reporter spec --bail --async-only --slow 1 --timeout 30000",
-		"mkapidoc": "dox --api < lib/index.js | sed -e 's/##/###/g'"
+		"doc": "dox --api < lib/index.js | sed -e 's/##/###/g'"
 	},
 	"dependencies": {
 		"level": "0.18.0"

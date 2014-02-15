@@ -74,7 +74,7 @@ db.tasks.put([{
 		// prints [ 4 ]
 		console.log(tasks.map(function(task) {return task.id;}));
 	});
-	
+
 	// find tasks in specific project and version (it uses projection 1)
 	db.tasks.find({
 		start: {project: 'proj 1', version: '1.0.0'}
@@ -83,7 +83,7 @@ db.tasks.put([{
 		// prints [ 1, 2 ]
 		console.log(tasks.map(function(task) {return task.id;}));
 	});
-	
+
 	// get by full key (it uses projection 1)
 	db.tasks.get({
 		project: 'proj 1',
@@ -153,13 +153,13 @@ db.tasks.put([{
   - `params.filter` - function(value) if it returns falsy value document will be
   excluded from result
 
-### DocsSection.get(key:Object, [callback(err,doc)]:Function)
+### DocsSection.get(key:Object, [projectionId]:String, [callback(err,doc)]:Function)
 
   Get document by full key
 
 ### DocsSection.update(key:Object, modifier:Object|Function, [callback(err)]:Function)
 
-  Update document by `key` using `modifier` which could object of fields and 
+  Update document by `key` using `modifier` which could object of fields and
   values to be updated or function which accepts document and returns modified
   document
 

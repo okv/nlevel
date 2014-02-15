@@ -179,19 +179,34 @@ describe('documents section', function() {
 		tasksSection.put(tasks.slice(1), done);
 	});
 
-	it('get value by key', function(done) {
+	it('get doc by key', function(done) {
 		tasksSection.get({id: tasks[0].id}, function(err, doc) {
-			if (err) done(err);
+			if (err) return done(err);
 			expect(doc).eql(tasks[0]);
 			done();
 		});
 	});
 
-	it('get value by unexisted key returns error', function(done) {
+	it('get doc by unexisted key returns error', function(done) {
 		tasksSection.get({id: 'unexisted key'}, function(err) {
 			expect(err).ok();
-			// levelup mark error in such way
+			// levelup differentiates errors in such way
 			expect(err.type).equal('NotFoundError');
+			done();
+		});
+	});
+
+	it('get doc by specified projection', function(done) {
+		var task = tasks[0],
+			key = {
+				project: task.project,
+				version: task.version,
+				assignee: task.assignee,
+				id: task.id
+			};
+		tasksSection.get(key, taskProjs[1].id, function(err, doc) {
+			if (err) return done(err);
+			expect(doc).eql(getTasks(taskProjs[1], {start: key})[0]);
 			done();
 		});
 	});
