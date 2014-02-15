@@ -179,6 +179,23 @@ describe('documents section', function() {
 		tasksSection.put(tasks.slice(1), done);
 	});
 
+	it('get value by key', function(done) {
+		tasksSection.get({id: tasks[0].id}, function(err, doc) {
+			if (err) done(err);
+			expect(doc).eql(tasks[0]);
+			done();
+		});
+	});
+
+	it('get value by unexisted key returns error', function(done) {
+		tasksSection.get({id: 'unexisted key'}, function(err) {
+			expect(err).ok();
+			// levelup mark error in such way
+			expect(err.type).equal('NotFoundError');
+			done();
+		});
+	});
+
 	it('found value by start', function(done) {
 		var params = {start: {project: 'proj 2'}};
 		tasksSection.find(params, function(err, data) {
@@ -302,7 +319,7 @@ describe('documents section', function() {
 		});
 	});
 
-	it('update document (with update and object) without errors', function(done) {
+	it('update document (using object modifier) without errors', function(done) {
 		var task = tasks[tasks.length - 1],
 			assignee = 'jane';
 		task.assignee = assignee;
@@ -316,7 +333,7 @@ describe('documents section', function() {
 		});
 	});
 
-	it('update document (with update and function) without errors', function(done) {
+	it('update document (using function modifier) without errors', function(done) {
 		var task = tasks[tasks.length - 1],
 			version = '0.3';
 		task.version = version;
