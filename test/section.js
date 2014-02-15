@@ -16,7 +16,7 @@ describe('bootstrap', function() {
 			createDb();
 		}
 		function createDb(err) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			db = lib.db(dbPath, {
 				valueEncoding: 'json'
 			});
@@ -119,7 +119,7 @@ describe('single value section', function() {
 
 	it('got value by key', function(done) {
 		tasksSection.get(function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data).eql(tasks);
 			done();
 		});
@@ -214,7 +214,7 @@ describe('documents section', function() {
 	it('found value by start', function(done) {
 		var params = {start: {project: 'proj 2'}};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
@@ -224,7 +224,7 @@ describe('documents section', function() {
 	it('found value by start using another projection', function(done) {
 		var params = {start: {assignee: 'jane'}};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[2], params));
 			done();
@@ -237,7 +237,7 @@ describe('documents section', function() {
 			start: {assignee: 'jane'}
 		};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[3], params, ['id']));
 			done();
@@ -247,7 +247,7 @@ describe('documents section', function() {
 	it('found value by start (with 2 field)', function(done) {
 		var params = {start: {project: 'proj 3', version: '0.1'}};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
@@ -260,7 +260,7 @@ describe('documents section', function() {
 			end: {project: 'proj 2'}
 		};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
@@ -276,7 +276,7 @@ describe('documents section', function() {
 			}
 		};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[1], {start: params.start}));
 			done();
@@ -289,7 +289,7 @@ describe('documents section', function() {
 			end: {project: 'proj 3', version: '0.2'}
 		};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
@@ -299,7 +299,7 @@ describe('documents section', function() {
 	it('found value with key which contains function', function(done) {
 		var params = {start: {done: 0}};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[4], params));
 			done();
@@ -308,7 +308,7 @@ describe('documents section', function() {
 
 	it('without condition found all', function(done) {
 		tasksSection.find({}, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data).eql(getTasks(taskProjs[0], {start: {id: ''}}));
 			done();
 		});
@@ -316,7 +316,7 @@ describe('documents section', function() {
 
 	it('found reversed values with reverse: true', function(done) {
 		tasksSection.find({reverse: true}, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data).eql(getTasks(taskProjs[0], {
 				start: {id: ''},
 				reverse: true
@@ -329,7 +329,7 @@ describe('documents section', function() {
 		var task = tasks[tasks.length - 1];
 		task.project = 'proj 1';
 		tasksSection.put(task, function(err) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			done();
 		});
 	});
@@ -339,9 +339,9 @@ describe('documents section', function() {
 			assignee = 'jane';
 		task.assignee = assignee;
 		tasksSection.update({id: task.id}, {assignee: assignee}, function(err) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			tasksSection.get({id: task.id}, function(err, doc) {
-				if (err) {done(err); return;}
+				if (err) return done(err);
 				expect(doc).eql(task);
 				done();
 			});
@@ -356,9 +356,9 @@ describe('documents section', function() {
 			doc.version = version;
 			return doc;
 		}, function(err) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			tasksSection.get({id: task.id}, function(err, doc) {
-				if (err) {done(err); return;}
+				if (err) return done(err);
 				expect(doc).eql(task);
 				done();
 			});
@@ -378,10 +378,10 @@ describe('documents section', function() {
 			doc.version = version;
 			return doc;
 		}, function(err, updatedCount) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(updatedCount).equal(2);
 			tasksSection.find(findParams, function(err, docs) {
-				if (err) {done(err); return;}
+				if (err) return done(err);
 				expect(docs).eql([task1, task2]);
 				done();
 			});
@@ -394,7 +394,7 @@ describe('documents section', function() {
 			end: {project: 'proj 3'}
 		};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[1], params));
 			done();
@@ -407,7 +407,7 @@ describe('documents section', function() {
 			end: {assignee: 'sam', project: 'proj 3'}
 		};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(getTasks(taskProjs[2], params));
 			done();
@@ -417,7 +417,7 @@ describe('documents section', function() {
 	it('delete', function(done) {
 		var params = {start: {project: 'proj 2'}};
 		tasksSection.find(params, function(err, data) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			tasksSection.del(data, function() {
 				getTasks(taskProjs[1], params).forEach(function(task) {
@@ -429,7 +429,7 @@ describe('documents section', function() {
 					}
 				});
 				tasksSection.find({}, function(err, data) {
-					if (err) {done(err); return;}
+					if (err) return done(err);
 					expect(data).eql(getTasks(taskProjs[0], {start: {id: ''}}));
 					done();
 				});
