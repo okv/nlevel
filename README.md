@@ -152,6 +152,9 @@ db.tasks.put([{
   - `params.reverse` - a boolean, set to true if you want to go in reverse order
   - `params.filter` - function(value) if it returns falsy value document will be
   excluded from result
+  - `params.usingValues` - (false by default) optimization flag, which can be
+  set to force of using `values` for some operations which uses `keys` by default
+  (e.g. counting)
 
 ### DocsSection.count(findParams:Object, [callback(err,documentsCount)]:Function)
 
