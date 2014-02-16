@@ -267,18 +267,29 @@ describe('documents section', function() {
 		});
 	});
 
+	var filterParams = {
+		start: {project: 'proj 1'},
+		end: {project: 'proj 2'},
+		filter: function(doc) {
+			return doc.project === 'proj 1';
+		}
+	};
 	it('found value by start and end with filter', function(done) {
-		var params = {
-			start: {project: 'proj 1'},
-			end: {project: 'proj 2'},
-			filter: function(doc) {
-				return doc.project === 'proj 1';
-			}
-		};
-		tasksSection.find(params, function(err, data) {
+		tasksSection.find(filterParams, function(err, data) {
 			if (err) return done(err);
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[1], {start: params.start}));
+			expect(data).eql(getTasks(taskProjs[1], {start: filterParams.start}));
+			done();
+		});
+	});
+
+	it('count value by start and end with filter', function(done) {
+		tasksSection.count(filterParams, function(err, count) {
+			if (err) return done(err);
+			expect(count).greaterThan(0);
+			expect(count).eql(
+				getTasks(taskProjs[1], {start: filterParams.start}).length
+			);
 			done();
 		});
 	});
@@ -321,6 +332,22 @@ describe('documents section', function() {
 				start: {id: ''},
 				reverse: true
 			}));
+			done();
+		});
+	});
+
+	it('count all', function(done) {
+		tasksSection.count({}, function(err, count) {
+			if (err) return done(err);
+			expect(count).eql(getTasks(taskProjs[0], {start: {id: ''}}).length);
+			done();
+		});
+	});
+
+	it('count all (limit doesn`t affect count)', function(done) {
+		tasksSection.count({limit: 1}, function(err, count) {
+			if (err) return done(err);
+			expect(count).eql(getTasks(taskProjs[0], {start: {id: ''}}).length);
 			done();
 		});
 	});

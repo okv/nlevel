@@ -153,6 +153,12 @@ db.tasks.put([{
   - `params.filter` - function(value) if it returns falsy value document will be
   excluded from result
 
+### DocsSection.count(findParams:Object, [callback(err,documentsCount)]:Function)
+
+  Count documents using `findParams` (see `find`).
+  Notice: It counts keys (or values) internally (can take long time e.g. on
+  large dataset)
+
 ### DocsSection.get(key:Object, [projectionId]:String, [callback(err,doc)]:Function)
 
   Get document by full key

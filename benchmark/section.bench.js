@@ -18,7 +18,7 @@ describe('benchmark', function() {
 			createDb();
 		}
 		function createDb(err) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			var ldb = lib.db(dbPath, {
 				valueEncoding: 'json'
 			});
@@ -46,7 +46,7 @@ describe('benchmark', function() {
 
 	it('get by id (from start)', function(done) {
 		db.users.get({id: 1}, function(err, doc) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(doc).ok();
 			done();
 		});
@@ -54,7 +54,7 @@ describe('benchmark', function() {
 
 	it('get by id (from middle)', function(done) {
 		db.users.get({id: Math.round(docsCount / 2)}, function(err, doc) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(doc).ok();
 			done();
 		});
@@ -62,7 +62,7 @@ describe('benchmark', function() {
 
 	it('get by id (from end)', function(done) {
 		db.users.get({id: docsCount}, function(err, doc) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			expect(doc).ok();
 			done();
 		});
@@ -72,7 +72,7 @@ describe('benchmark', function() {
 		db.users.find({
 			start: {firstName: 'Elina', lastName: 'Simons'},
 		}, function(err, docs) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			console.log('result count: ', docs.length);
 			done();
 		});
@@ -82,7 +82,7 @@ describe('benchmark', function() {
 		db.users.find({
 			start: {cityOfBirt: 'Clintwood', occupation: 'Paper Conservator'},
 		}, function(err, docs) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			console.log('result count: ', docs.length);
 			done();
 		});
@@ -93,7 +93,7 @@ describe('benchmark', function() {
 			start: {birthday: new Date('October 01, 1990 00:00:00').getTime()},
 			end: {birthday: new Date('December 01, 1990 00:00:00').getTime()}
 		}, function(err, docs) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			console.log('result count: ', docs.length);
 			done();
 		});
@@ -101,12 +101,20 @@ describe('benchmark', function() {
 
 	it('update document (from middle)', function(done) {
 		db.users.get({id: Math.round(docsCount / 2)}, function(err, doc) {
-			if (err) {done(err); return;}
+			if (err) return done(err);
 			doc.firstName += ' 1';
 			doc.occupation += ' 1';
 			doc.birthday += 1;
 			doc.cityOfBirt += ' 1';
 			db.users.put(doc, done);
+		});
+	});
+
+	it('count all docs', function(done) {
+		db.users.count({}, function(err, count) {
+			if (err) return done(err);
+			console.log('count: ', count);
+			done();
 		});
 	});
 });
