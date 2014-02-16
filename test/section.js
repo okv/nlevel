@@ -211,6 +211,14 @@ describe('documents section', function() {
 		});
 	});
 
+	it('find returns empty array if documents not found', function(done) {
+		tasksSection.find({start: {id: 'unexisted id'}}, function(err, data) {
+			if (err) return done(err);
+			expect(data).eql([]);
+			done();
+		});
+	});
+
 	it('found value by start', function(done) {
 		var params = {start: {project: 'proj 2'}};
 		tasksSection.find(params, function(err, data) {
@@ -294,6 +302,17 @@ describe('documents section', function() {
 		});
 	});
 
+	it('offset doc found value by start and end with filter', function(done) {
+		tasksSection.find(extend({offset: 1}, filterParams), function(err, data) {
+			if (err) return done(err);
+			expect(data.length).greaterThan(0);
+			expect(data).eql(
+				getTasks(taskProjs[1], {start: filterParams.start}).slice(1)
+			);
+			done();
+		});
+	});
+
 	it('found value by start and end (with 2 field)', function(done) {
 		var params = {
 			start: {project: 'proj 3', version: '0.1'},
@@ -325,6 +344,23 @@ describe('documents section', function() {
 		});
 	});
 
+	it('offset skips documents', function(done) {
+		tasksSection.find({offset: 3}, function(err, data) {
+			if (err) return done(err);
+			expect(data).eql(getTasks(taskProjs[0], {start: {id: ''}}).slice(3));
+			done();
+		});
+	});
+
+	it('offset greater than result count returns empty array', function(done) {
+		var offset = getTasks(taskProjs[0], {start: {id: ''}}).length + 1;
+		tasksSection.find({offset: offset}, function(err, data) {
+			if (err) return done(err);
+			expect(data).eql([]);
+			done();
+		});
+	});
+
 	it('found reversed values with reverse: true', function(done) {
 		tasksSection.find({reverse: true}, function(err, data) {
 			if (err) return done(err);
@@ -346,6 +382,14 @@ describe('documents section', function() {
 
 	it('count all (limit doesn`t affect count)', function(done) {
 		tasksSection.count({limit: 1}, function(err, count) {
+			if (err) return done(err);
+			expect(count).eql(getTasks(taskProjs[0], {start: {id: ''}}).length);
+			done();
+		});
+	});
+
+	it('count all (limit doesn`t affect count)', function(done) {
+		tasksSection.count({offset: 1}, function(err, count) {
 			if (err) return done(err);
 			expect(count).eql(getTasks(taskProjs[0], {start: {id: ''}}).length);
 			done();
@@ -464,3 +508,8 @@ describe('documents section', function() {
 		});
 	});
 });
+
+function extend(dst, src) {
+	for (var key in src) {dst[key] = src[key];}
+	return dst;
+}
