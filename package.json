@@ -1,14 +1,15 @@
 {
 	"name": "nlevel",
-	"description": "node.js odm for leveldb",
-	"version": "0.2.0",
+	"description": "node.js odm for leveldb/levelup",
+	"version": "1.0.0",
 	"author": "Oleg Korobenko <oleg.korobenko@gmail.com>",
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/okv/nlevel"
 	},
 	"keywords": [
-		"leveldb", "level", "store", "storage", "db", "database", "in-process", "sqlight"
+		"leveldb", "levelup", "level", "store", "storage", "db", "database",
+		"in-process", "sqlight"
 	],
 	"scripts": {
 		"test": "mocha test --reporter spec --bail --async-only",
