@@ -18,6 +18,7 @@ describe('bootstrap', function() {
 		function createDb(err) {
 			if (err) return done(err);
 			db = lib.db(dbPath, {
+				db: require('memdown'),
 				valueEncoding: 'json'
 			});
 			done();

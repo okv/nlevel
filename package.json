@@ -16,12 +16,13 @@
 		"doc": "dox --api < lib/index.js | sed -e 's/##/###/g'"
 	},
 	"dependencies": {
-		"level": "0.18.0"
+		"levelup": ">= 0.9.0"
 	},
 	"devDependencies": {
 		"mocha": "1.11.0",
 		"expect.js": "0.2.0",
-		"dox": "0.4.4"
+		"dox": "0.4.4",
+		"memdown": "1.0.0"
 	},
 	 "main": "./lib/index"
 }
