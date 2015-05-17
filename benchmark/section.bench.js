@@ -20,6 +20,7 @@ describe('benchmark', function() {
 		function createDb(err) {
 			if (err) return done(err);
 			var ldb = lib.db(dbPath, {
+				db: require('memdown'),
 				valueEncoding: 'json'
 			});
 			db = {

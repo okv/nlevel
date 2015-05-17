@@ -54,6 +54,13 @@ var taskProjs = [
 
 lib.DocsSection.prototype._calcProjectionIds.call({projections: taskProjs});
 
+function extend(distanation, source) {
+	for (var key in source) {
+		distanation[key] = source[key];
+	}
+	return distanation;
+};
+
 function getTasks(projection, params, outFields) {
 	var context = {
 		name: 'name',
@@ -263,7 +270,7 @@ describe('documents section', function() {
 		});
 	});
 
-	it('found value by start and end  (with 1 field)', function(done) {
+	it('found value by start and end (with 1 field)', function(done) {
 		var params = {
 			start: {project: 'proj 1'},
 			end: {project: 'proj 2'}
@@ -276,18 +283,60 @@ describe('documents section', function() {
 		});
 	});
 
+	it('found value by start and end (with 1 field) and limit', function(done) {
+		var params = {
+			start: {project: 'proj 1'},
+			end: {project: 'proj 2'},
+			limit: 1
+		};
+		tasksSection.find(params, function(err, data) {
+			if (err) return done(err);
+			expect(data.length).equal(1);
+			expect(data).eql(getTasks(taskProjs[1], params).slice(0, 1));
+			done();
+		});
+	});
+
 	var filterParams = {
 		start: {project: 'proj 1'},
-		end: {project: 'proj 2'},
+		end: {project: 'proj 3'},
 		filter: function(doc) {
-			return doc.project === 'proj 1';
+			return doc.project === 'proj 2';
 		}
 	};
 	it('found value by start and end with filter', function(done) {
 		tasksSection.find(filterParams, function(err, data) {
 			if (err) return done(err);
 			expect(data.length).greaterThan(0);
-			expect(data).eql(getTasks(taskProjs[1], {start: filterParams.start}));
+			expect(data).eql(
+				getTasks(taskProjs[1], {start: {project: 'proj 2'}})
+			);
+			done();
+		});
+	});
+
+	it('found value by start and end with filter and limit', function(done) {
+		var limitFilterParams = extend({limit: 1}, filterParams);
+
+		tasksSection.find(limitFilterParams, function(err, data) {
+			if (err) return done(err);
+			expect(data.length).equal(1);
+			expect(data).eql(
+				getTasks(taskProjs[1], {start: {project: 'proj 2'}}).slice(0, 1)
+			);
+			done();
+		});
+	});
+
+	it('found value by start and end with filter, limit and offset', function(done) {
+		var limitOffsetFilterParams = extend({limit: 1, offset: 1}, filterParams);
+
+		tasksSection.find(limitOffsetFilterParams, function(err, data) {
+			if (err) return done(err);
+			expect(data.length).equal(1);
+			expect(data).eql(
+				getTasks(taskProjs[1], {start: {project: 'proj 2'}}).slice(1, 2)
+			);
 			done();
 		});
 	});
@@ -297,7 +346,7 @@ describe('documents section', function() {
 			if (err) return done(err);
 			expect(count).greaterThan(0);
 			expect(count).eql(
-				getTasks(taskProjs[1], {start: filterParams.start}).length
+				getTasks(taskProjs[1], {start: {project: 'proj 2'}}).length
 			);
 			done();
 		});
@@ -308,7 +357,7 @@ describe('documents section', function() {
 			if (err) return done(err);
 			expect(data.length).greaterThan(0);
 			expect(data).eql(
-				getTasks(taskProjs[1], {start: filterParams.start}).slice(1)
+				getTasks(taskProjs[1], {start: {project: 'proj 2'}}).slice(1)
 			);
 			done();
 		});
