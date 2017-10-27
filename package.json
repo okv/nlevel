@@ -17,7 +17,7 @@
 		"doc": "dox --api < lib/index.js | sed -e 's/##/###/g'"
 	},
 	"dependencies": {
-		"levelup": ">= 0.9.0"
+		"levelup": "1.3.9"
 	},
 	"devDependencies": {
 		"mocha": "1.11.0",
